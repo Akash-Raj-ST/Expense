@@ -3,9 +3,10 @@ import React,{useState} from 'react'
 
 import Tab from '../Components/Tab';
 import Input from '../Components/Input';
+import Button from '../Components/Button';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import Button from '../Components/Button';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Add() {
   
@@ -42,12 +43,28 @@ function Expense(){
 	const [date,setDate] = useState(new Date());
 	const [amount,setAmount] = useState(0);
 
-	const handleSubmit = ()=>{
+
+	const storeData = async () => {
 		console.log("Adding item");
-		console.log(categoryType);
-		console.log(date);
-		console.log(amount);
+		const item = [{
+			type:categoryType,
+			date:date,
+			amount:amount
+		}]
+
+		try {
+			let items  = await AsyncStorage.getItem('data');
+			
+			if(items != null) items = JSON.parse(items).concat(item);
+			else items = item;
+			
+			const jsonValue = JSON.stringify(items);
+			await AsyncStorage.setItem('data', jsonValue);
+		} catch (e) {
+			console.log(e);
+		}
 	}
+
    	return(
 		<View>
 			<View>
@@ -61,7 +78,7 @@ function Expense(){
 				<Text style={stylesTwo.label}>Date:</Text>
 				<DateInput date={date} setDate={setDate}/>
 			</View>
-			<Button text="Add" onClick={handleSubmit}/>
+			<Button text="Add" onClick={storeData}/>
 		</View>
    	)
 }
