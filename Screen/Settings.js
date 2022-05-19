@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-export default function Add() {
+export default function Settings() {
   return (
     <View>
-      <Text>Add</Text>
+      <Text>Settings</Text>
     </View>
   )
 }
