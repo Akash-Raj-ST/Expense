@@ -194,7 +194,21 @@ function Income(){
 	const [amount,setAmount]  = useState(0);
 
 	const updateAmount = async()=>{
-		console.log("amount updated");
+		try {
+			let amount_present = await AsyncStorage.getItem('amount');
+			let total_amount;
+			let curr_amount = parseFloat(amount);
+			console.log("amount_present: "+amount_present);
+
+			if(amount_present!=null) total_amount = curr_amount + parseFloat(JSON.parse(amount_present));  
+			else total_amount = curr_amount;
+
+			await AsyncStorage.setItem('amount', JSON.stringify(total_amount));
+			console.log(total_amount);      
+		} catch (e) {
+			console.log(e);
+			await AsyncStorage.setItem('amount', JSON.stringify(amount));
+		}
 	}
 
 	return(

@@ -13,7 +13,9 @@ export default function App() {
     <NavigationContainer>
       <Tab.Navigator>
        
-        <Tab.Screen name="Add" component={Settings} />
+        <Tab.Screen name="Add" component={Add} />
+        <Tab.Screen name="Settings" component={Settings} />
+
       </Tab.Navigator>
     </NavigationContainer>
   );
