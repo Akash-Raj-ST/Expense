@@ -1,19 +1,14 @@
 
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native'
-import React,{useState} from 'react'
+import { StyleSheet, Text, View, ScrollView, TextInput, Image } from 'react-native'
+import React,{useState,useEffect} from 'react'
 
 import Button from '../Components/Button';
 import { categories } from '../Components/Categories';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-
-
-import Button from '../Components/Button';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Home from './Screen/Home';
 import Stats from './Screen/Stats';
 import Settings from './Screen/Settings';
+import Add from './Screen/Add';
 import { StatusBar } from 'react-native';
 
 const Tab = createBottomTabNavigator();
@@ -38,6 +39,13 @@ export default function App() {
           <Tab.Screen
             name="Home"
             component={Home}
+            options={{
+              headerShown: false
+            }}
+          />
+          <Tab.Screen
+            name="Add"
+            component={Add}
             options={{
               headerShown: false
             }}
