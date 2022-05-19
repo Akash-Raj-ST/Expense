@@ -1,5 +1,9 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 export default function Button(props) {
   return (
@@ -17,14 +21,14 @@ const styles = StyleSheet.create({
         borderRadius:10,
         backgroundColor:"#F3CF58",
         alignSelf:"center",
-        paddingHorizontal:10,
-        paddingVertical:5,
-        marginVertical:10
+        paddingHorizontal:wp("25%"),
+        paddingVertical:hp("1%"),
+        marginVertical:hp("1%"),
     },
     buttonText:{
         color:"black",
         fontWeight:"bold",
-        fontSize:22,
+        fontSize:hp("3.5%"),
         textAlign:"center",
     }
 })

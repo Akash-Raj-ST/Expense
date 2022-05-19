@@ -4,9 +4,15 @@ import React,{useState} from 'react'
 import Tab from '../Components/Tab';
 import Input from '../Components/Input';
 import Button from '../Components/Button';
+import { categories } from '../Components/Categories';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 export default function Add() {
   
@@ -68,6 +74,7 @@ function Expense(){
    	return(
 		<View>
 			<View>
+				<Text style={stylesTwo.label}>Amount:</Text>
 				<Input attValue={amount} setValue={setAmount} placeholder="Amount: " type="number-pad"/>
 			</View>
 			<View>
@@ -83,31 +90,7 @@ function Expense(){
    	)
 }
 
-function Income(){
-	return(
-		<Text style={{color:"white"}}>Income</Text>
-	)
-}
-
 function Category(props){
-	const categories = [
-		{
-			type:"Food",
-			logo:require("../assets/images/food.png"),
-		},
-		{
-			type:"Transport",
-			logo:require("../assets/images/food.png"),
-		},
-		{
-			type:"Laundary",
-			logo:require("../assets/images/food.png"),
-		},
-		{
-			type:"Others",
-			logo:require("../assets/images/food.png"),
-		}
-	]
 
 	return(
 			<ScrollView horizontal>
@@ -118,7 +101,7 @@ function Category(props){
 						style={styles(category.type,props.categoryType).category}
 						onPress={()=>{props.setCategoryType(category.type)}}
 					>
-						<Image source={category.logo} style={{width:30,height:30}}/>
+						<Image source={category.logo} style={{width:wp("10%"),height:wp("10%")}}/>
 						<Text style={styles(category.type,props.categoryType).categoryText}>{category.type}</Text>
 					</TouchableOpacity>
 				))} 
@@ -139,7 +122,7 @@ function DateInput({date,setDate}){
                 setOpenDate(true);
             }}
         >
-            <Text style={{fontWeight:'bold',fontSize:18,color:"#857474"}}>{date.getDate()}/{date.getMonth()+1}/{date.getFullYear()}</Text>
+            <Text style={{fontWeight:'bold',fontSize:hp("4%"),color:"#857474"}}>{date.getDate()}/{date.getMonth()+1}/{date.getFullYear()}</Text>
            {openDate && <DateTimeModal mode='date' setOpen={setOpenDate} value={date} setValue={setDate}/>}
         </TouchableOpacity>
     )
@@ -173,8 +156,8 @@ function DateTimeModal(props){
 
 const styles =(category,choice)=>StyleSheet.create({
 	category:{
-		paddingHorizontal:10,
-		paddingVertical:5,
+		paddingHorizontal:wp("3%"),
+		paddingVertical:hp("1%"),
 		borderRadius:5,
 		backgroundColor:category===choice?"#F3CF58":"black",
 		margin:10,
@@ -183,7 +166,7 @@ const styles =(category,choice)=>StyleSheet.create({
 	},
 	categoryText:{
 		color:"white",
-		fontSize:18,
+		fontSize:hp("3%"),
 		color:category===choice?"black":"white",
 		fontWeight:"bold"
 	}
@@ -192,15 +175,40 @@ const styles =(category,choice)=>StyleSheet.create({
 const stylesTwo = StyleSheet.create({
 	label:{
 		color:"white",
-		fontSize:22,
-		padding:10,
-		marginBottom:5
+		fontSize:hp("3%"),
+		paddingTop:hp("5%"),
+		paddingBottom:hp("1%"),
+		marginBottom:hp("1%"),
+		paddingHorizontal:wp("2%"),
 	},
 	date:{
-		marginBottom:10,
+		marginBottom:hp("2%"),
 		borderBottomColor:"white",
 		borderWidth:2,
-		marginHorizontal:10,
-         paddingHorizontal:10,
+		marginHorizontal:wp("2%"),
+        paddingHorizontal:wp("2%"),
 	}
 })
+
+function Income(){
+	const [amount,setAmount]  = useState(0);
+
+	const updateAmount = async()=>{
+		console.log("amount updated");
+	}
+
+	return(
+		<View>	
+			<View>
+				<Text style={stylesTwo.label}>Amount:</Text>
+				<Input attValue={amount} setValue={setAmount} placeholder="Amount: " type="number-pad"/>
+			</View>
+			<View style={{
+				height:hp("25%"),
+				justifyContent:"center",
+			}}>
+				<Button text="Add Money" onClick={updateAmount}/>
+			</View>
+		</View>
+	)
+}

@@ -1,23 +1,20 @@
 import {View,Text, TextInput } from 'react-native'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 export default function Input(props){
     return(
         <View style={{marginVertical:5}}>
-            <Text 
-                style={{
-                    color:"white",
-                    fontSize:22,
-                    padding:10,
-                    marginBottom:5
-                }}
-            >{props.placeholder}</Text>
+
             <TextInput 
                 style={{
                     borderWidth:2,
-                    marginHorizontal:10,
-                    paddingHorizontal:10,
+                    marginHorizontal:wp("2%"),
+                    paddingHorizontal:wp("2%"),
                     fontWeight:'bold',
-                    fontSize:18,
+                    fontSize:hp("4%"),
                     backgroundColor:'black',
                     color:"#857474",
                     borderBottomColor:"white"
