@@ -1,10 +1,54 @@
 import { StyleSheet, Text, SafeAreaView, Image, TouchableHighlight, Modal, View, TextInput } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar'
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+   
 export default function Initial () {
   const [modalVisible, setModalVisible] = useState(false)
-  const [name, setName] = useState('')
+  const [name, setName] = useState('');
+  const [loading,setLoading] = useState(true);
+
+  const navigation = useNavigation();
+
+  const handleLogin = async()=>{
+    if(name.length >= 1){
+      setLoading(true);
+      //intialize values
+      AsyncStorage.setItem('username',JSON.stringify(name)).then(
+        ()=>{
+          navigation.navigate("Main");
+        }
+      )
+    }
+    
+  }
+
+
+  const newUser = async() =>{
+    try {
+      AsyncStorage.getItem('username').then((value)=>{
+          console.log(value)
+          if(value!=null) navigation.navigate("Main");
+      });
+    
+    } catch (error) {
+      console.log(error)
+    }
+    setLoading(false);
+  } 
+
+ 
+
+  if(loading){
+    newUser();
+    return(
+      <Text>Loading...</Text>
+    )
+  }
+
+  else
   return (
     <>
       <SafeAreaView style={styles.container}>
@@ -29,7 +73,7 @@ export default function Initial () {
               activeOpacity={0.6}
               underlayColor='#C2A33C'
               style={styles.modalButton}
-              onPress={() => setModalVisible(!modalVisible)}
+              onPress={() => handleLogin()}
             >
               <Text style={styles.modalButtonText}>Proceed</Text>
             </TouchableHighlight>

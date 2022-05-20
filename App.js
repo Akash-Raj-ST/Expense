@@ -1,21 +1,46 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import { Ionicons } from '@expo/vector-icons';
 import Home from './Screen/Home';
 import Stats from './Screen/Stats';
 import Settings from './Screen/Settings';
 import Add from './Screen/Add';
+import Initial from './Screen/Initial';
+
 import { StatusBar } from 'react-native';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
+    <NavigationContainer>
+       <Stack.Navigator>
+        <Stack.Screen 
+          name="Initial" 
+          component={Initial} 
+          options={{
+            headerShown: false
+          }}/>
+        <Stack.Screen 
+          name="Main" 
+          component={HomeTabs} 
+          options={{
+            headerShown: false
+          }}/>
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+function HomeTabs(){
+  return(
     <>
       <StatusBar
         style='light'
       />
-      <NavigationContainer>
         <Tab.Navigator
           screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
@@ -65,7 +90,7 @@ export default function App() {
             }}
           />
         </Tab.Navigator>
-      </NavigationContainer>
     </>
   );
 }
+

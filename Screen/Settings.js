@@ -37,7 +37,6 @@ export default function Settings() {
 
 
     const setValue = (type,value) =>{
-        console.log("updating limit...");
         var newLimits  = limits;
         newLimits[type] = value;
         setLimits(newLimits);

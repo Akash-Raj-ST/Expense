@@ -1,6 +1,9 @@
 import { StyleSheet, Text, SafeAreaView, View, TouchableHighlight, FlatList } from 'react-native'
 import { FontAwesome, AntDesign, Ionicons } from '@expo/vector-icons'
-import React from 'react'
+import React,{useState,useEffect} from 'react'
+import Initial from './Initial'
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Data = [
   {
@@ -74,12 +77,29 @@ const Item = ({ title, iconType, amount }) => (
 )
 
 export default function Home () {
+
+  const [name,setName] = useState("Welcome")
+
   const renderItem = ({ item }) => (
     <Item title={item.title} iconType={item.iconType} amount={item.amount} />
   )
+
+  const setUserName = async()=>{
+      try{
+         AsyncStorage.getItem('username').then((value)=>{setName(JSON.parse(value))})
+      }catch(e){
+        console.log(e);
+      }
+  }  
+
+
+  useEffect(()=>{
+    setUserName();
+  },[])
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.userName}>Akash</Text>
+      <Text style={styles.userName}>{name}</Text>
       <View style={styles.infoContainer}>
         <Text style={styles.unspendAmount}><FontAwesome name='rupee' size={24} color='black' /> 2,345</Text>
         <Text style={styles.totalLimit}>Left of  <FontAwesome name='rupee' size={11} color='black' /> 5000</Text>
