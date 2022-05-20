@@ -59,13 +59,17 @@ export default function Settings() {
     return (
         <View style={{backgroundColor:"black",flex:1}}>
             <Text style={styles.heading}>Limit Alerts</Text>
-            <ScrollView style={{height:"70%"}}>
-                {categories.map((category,index)=>(
-                    <Category key={index} category={category} limits={limits} setValue={setValue}/>
-                ))}
+            <View style={{height:"60%"}}>
+                <ScrollView>
+                    {categories.map((category,index)=>(
+                        <Category key={index} category={category} limits={limits} setValue={setValue}/>
+                    ))}
 
-            </ScrollView>
-            <Button text="Update" onClick={updateLimits}/>
+                </ScrollView>
+            </View>
+            <View style={{flex:1,justifyContent:"center"}}>   
+                <Button text="Update" onClick={updateLimits}/>
+            </View>
         </View>
     )
 }         

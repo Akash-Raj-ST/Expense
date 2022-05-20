@@ -14,7 +14,8 @@ export default function Tab(props){
                 paddingHorizontal:wp("4%"),
                 paddingVertical: hp("1%"),
                 borderRadius:15,
-                width:"50%",
+                //width:"30%",
+                flexGrow:1
             }}
 
             onPress={()=>props.setCurrentTab(props.text)}

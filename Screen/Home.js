@@ -1,7 +1,6 @@
 import { StyleSheet, Text, SafeAreaView, View, TouchableHighlight, FlatList } from 'react-native'
 import { FontAwesome, AntDesign, Ionicons } from '@expo/vector-icons'
 import React,{useState,useEffect} from 'react'
-import Initial from './Initial'
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
