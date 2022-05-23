@@ -16,6 +16,11 @@ export default function Initial () {
     if(name.length >= 1){
       setLoading(true);
       //intialize values
+      var limits = {Food:0,Transport:0,Laundary:0,Others:0};
+      var data = [];
+      await AsyncStorage.setItem('limit_data', JSON.stringify(limits));
+      await AsyncStorage.setItem('data', JSON.stringify(data));
+
       AsyncStorage.setItem('username',JSON.stringify(name)).then(
         ()=>{
           navigation.navigate("Main");
@@ -28,6 +33,7 @@ export default function Initial () {
 
   const newUser = async() =>{
     try {
+      //await AsyncStorage.clear();
       AsyncStorage.getItem('username').then((value)=>{
           console.log(value)
           if(value!=null) navigation.navigate("Main");
@@ -48,7 +54,6 @@ export default function Initial () {
     )
   }
 
-  else
   return (
     <>
       <SafeAreaView style={styles.container}>
