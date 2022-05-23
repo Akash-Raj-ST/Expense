@@ -10,6 +10,7 @@ import {
 } from "react-native-responsive-screen";
 
 import Tab from '../Components/Tab';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Stats() {
 
@@ -22,6 +23,29 @@ export default function Stats() {
   const [month,setMonth] = useState(parseInt(moment(new Date()).format('MM'))-1);
   const [year,setYear] = useState(parseInt(moment(new Date()).format('YYYY')));
 
+  const [allData,setAllData] = useState([]);
+  const [loading,setLoading] = useState(true);
+
+  const getData = async()=>{
+    try{
+      AsyncStorage.getItem('data').then((value)=>{
+        setAllData(JSON.parse(value));
+      })
+    }catch(e){
+      console.log(e);
+    }
+    setLoading(false);
+  }
+
+  useEffect(()=>{
+    getData();
+  },[])
+
+  if(loading){
+    return(
+      <Text>Loading....</Text>
+    )
+  }
 
   return (
   
@@ -36,9 +60,9 @@ export default function Stats() {
         {currentTab=="Custom" && <CustomInput dateFrom={dateFrom} setDateFrom={setDateFrom} dateTo={dateTo} setDateTo={setDateTo}/>} 
       </View>
 
-      {currentTab=="Daily" && <Pie setTotal={setTotal} currentTab={currentTab} date={date}/>}
-      {currentTab=="Monthly" && <Pie setTotal={setTotal} currentTab={currentTab} month={month} year={year}/>}
-      {currentTab=="Custom" && <Pie setTotal={setTotal} currentTab={currentTab} s_date={dateFrom} e_date={dateTo} />}
+      {currentTab=="Daily" && <Pie allData={allData} setTotal={setTotal} currentTab={currentTab} date={date}/>}
+      {currentTab=="Monthly" && <Pie allData={allData} setTotal={setTotal} currentTab={currentTab} month={month} year={year}/>}
+      {currentTab=="Custom" && <Pie allData={allData} setTotal={setTotal} currentTab={currentTab} s_date={dateFrom} e_date={dateTo} />}
 
  
       <Total total={total}/>
@@ -206,17 +230,6 @@ function CustomInput({dateFrom,setDateFrom,dateTo,setDateTo}){
 }
 
 function Pie(props) {
-  
-  const all_data=[
-    {type: "FOOD", amount: 150, date: new Date()},
-    {type: "TRAVEL", amount: 100, date: new Date()},
-    {type: "LAUNDRY", amount: 100, date: new Date()},
-    {type: "STATIONARY", amount: 700, date: new Date()},
-    {type: "FOOD", amount: 600, date: new Date()},
-    {type: "OTHERS", amount: 90, date: new Date('2022-05-17')},
-    {type: "FOOD", amount: 100, date: new Date('2021-02-12')},
-    {type: "LAUNDRY", amount: 100, date: new Date('2021-11-12')}
-  ]
 
   const [pieData,setPieData] = useState([
           { name: 'FOOD', population: 0, color: '#F3CF58', legendFontColor: '#F3CF58', legendFontSize: 15 },
@@ -226,7 +239,7 @@ function Pie(props) {
           { name: 'OTHERS', population: 0, color: '#79867C', legendFontColor: '#F3CF58', legendFontSize: 15 }
       ]);
 
-  const setDates = () =>{
+  const setDates = (allData) =>{
     var s_date;
     var e_date;
 
@@ -243,40 +256,40 @@ function Pie(props) {
 
     if(props.currentTab == "Daily"||"Custom"){
 
-      all_data.forEach(x => {
+      allData.forEach(x => {
           dt = moment(x.date).format('YYYY-MM-DD')
   
           if(dt>=s_date && dt<=e_date){
-                  if(x.type=="FOOD")
-                    p[0]+=x.amount
-                  else if(x.type=="TRAVEL")
-                    p[1]+=x.amount
-                  else if(x.type=="LAUNDRY")
-                    p[2]+=x.amount
-                  else if(x.type=="STATIONARY")
-                    p[3]+=x.amount
+                  if(x.type=="Food")
+                    p[0]+=parseInt(x.amount)
+                  else if(x.type=="Transport")
+                    p[1]+=parseInt(x.amount)
+                  else if(x.type=="Laundary")
+                    p[2]+=parseInt(x.amount)
+                  else if(x.type=="Stationary")
+                    p[3]+=parseInt(x.amount)
                   else      
-                    p[4]+=x.amount
+                    p[4]+=parseInt(x.amount)
           }       
         } 
       );
     }
     if(props.currentTab == "Monthly"){
-      all_data.forEach(x => {
+      allData.forEach(x => {
           var dt_month = parseInt(moment(x.date).format('MM'))-1;
           var dt_year = parseInt(moment(x.date).format('YYYY'));
 
           if(dt_month==props.month && dt_year==props.year){
-                  if(x.type=="FOOD")
-                    p[0]+=x.amount
-                  else if(x.type=="TRAVEL")
-                    p[1]+=x.amount
-                  else if(x.type=="LAUNDRY")
-                    p[2]+=x.amount
-                  else if(x.type=="STATIONARY")
-                    p[3]+=x.amount
+                  if(x.type=="Food")
+                    p[0]+=parseInt(x.amount)
+                  else if(x.type=="Transport")
+                    p[1]+=parseInt(x.amount)
+                  else if(x.type=="Laundary")
+                    p[2]+=parseInt(x.amount)
+                  else if(x.type=="Stationary")
+                    p[3]+=parseInt(x.amount)
                   else      
-                    p[4]+=x.amount
+                    p[4]+=parseInt(x.amount)
           }    
         } 
       );
@@ -302,8 +315,8 @@ function Pie(props) {
 
   useEffect(()=>{
     //set all data using aysncStorage
-    setDates();
-  },[props.s_date,props.e_date,props.date,props.month])
+    setDates(props.allData);
+  },[props.s_date,props.e_date,props.date,props.month,props.allData])
 
   return (
     <View  >
