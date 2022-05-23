@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native'
-import React,{useState} from 'react'
+import React,{useState,useEffect} from 'react'
 
 import Tab from '../Components/Tab';
 import Input from '../Components/Input';
@@ -17,6 +17,8 @@ import {
 export default function Add() {
   
   	const [currentTab,setCurrentTab] = useState("Expense");
+
+	
 
   	return (
     	<View
@@ -48,10 +50,42 @@ function Expense(){
 	const [categoryType,setCategoryType] = useState("Food");
 	const [date,setDate] = useState(new Date());
 	const [amount,setAmount] = useState(0);
+	const [limits,setLimits] = useState({Food:0,Transport:0,Laundary:0,Others:0});
+	const [totalData,setTotalData] = useState([]);
+	const [loading,setLoading] = useState(true);
 
 
+	const initializeData = async() =>{
+		try{
+			//limits
+			AsyncStorage.getItem('limit_data').then((value)=>{setLimits(JSON.parse(value))});
+			AsyncStorage.getItem('data').then((value)=>{
+				var data = JSON.parse(value);
+				data = filterData(data);
+				setTotalData(data);
+			});
+
+		}catch(e){
+			console.log(e);
+		}
+		setLoading(false);
+	}
+
+	useEffect(() => {
+		initializeData();
+	}, [])
+
+	if(loading){
+		return(
+			<View>
+				<Text>Loading.....</Text>
+			</View>
+		)
+	}
+	
 	const storeData = async () => {
 		console.log("Adding item");
+		console.log(limits);
 		const item = [{
 			type:categoryType,
 			date:date,
@@ -59,13 +93,25 @@ function Expense(){
 		}]
 
 		try {
+			//check limits
+			if(item[0].date.getMonth() == new Date().getMonth()){
+				console.log("COndition passed");
+				var limit_value = parseInt(limits[categoryType]);
+				var curr_value = parseInt(totalData[categoryType])+parseInt(item[0].amount);
+				console.log(curr_value);
+				if(curr_value>limit_value && limit_value>0){
+					console.log("limit exceeded in "+categoryType+" limit was "+limit_value);
+					//alert
+				}
+			}+9+9
+			
 			let items  = await AsyncStorage.getItem('data');
 			
 			if(items != null) items = JSON.parse(items).concat(item);
 			else items = item;
 			
 			const jsonValue = JSON.stringify(items);
-			await AsyncStorage.setItem('data', jsonValue);
+			AsyncStorage.setItem('data', jsonValue).then(()=>{setTotalData(filterData(items))});
 		} catch (e) {
 			console.log(e);
 		}
@@ -153,6 +199,28 @@ function DateTimeModal(props){
     )
 }
 
+function filterData(data){
+	
+	var month = new Date().getMonth();
+	var year = new Date().getFullYear();
+
+	var finalData = {Food:0,Transport:0,Laundary:0,Others:0};
+
+	data.forEach(element => {
+		var date = new Date(element.date);
+		if(date.getMonth()==month && date.getFullYear()==year){
+			if(element.type in finalData){
+				finalData[element.type] += parseInt(element.amount);
+			}else{
+				finalData[element.type] = parseInt(element.amount);
+			}
+		}
+	});
+	console.log("filtered");
+	console.log(finalData);
+	return finalData;
+}
+
 
 const styles =(category,choice)=>StyleSheet.create({
 	category:{
@@ -226,3 +294,4 @@ function Income(){
 		</View>
 	)
 }
+

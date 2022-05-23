@@ -10,6 +10,7 @@ import {
 } from "react-native-responsive-screen";
 
 import Tab from '../Components/Tab';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Stats() {
 
@@ -18,8 +19,33 @@ export default function Stats() {
   const [total,setTotal]=useState(0);
   const [date,setDate] = useState(new Date());
   const [dateFrom,setDateFrom] = useState(new Date());
-  
-  
+  const [dateTo,setDateTo] = useState(new Date());
+  const [month,setMonth] = useState(parseInt(moment(new Date()).format('MM'))-1);
+  const [year,setYear] = useState(parseInt(moment(new Date()).format('YYYY')));
+
+  const [allData,setAllData] = useState([]);
+  const [loading,setLoading] = useState(true);
+
+  const getData = async()=>{
+    try{
+      AsyncStorage.getItem('data').then((value)=>{
+        setAllData(JSON.parse(value));
+      })
+    }catch(e){
+      console.log(e);
+    }
+    setLoading(false);
+  }
+
+  useEffect(()=>{
+    getData();
+  },[])
+
+  if(loading){
+    return(
+      <Text>Loading....</Text>
+    )
+  }
 
   return (
   
@@ -28,13 +54,17 @@ export default function Stats() {
 
       <Buttons currentTab={currentTab} setCurrentTab={setCurrentTab} />
       
-      <View style={{flexDirection:"row",justifyContent:"space-around",height:hp("10%"),alignItems:"center"}}>  
-        {currentTab=="Custom" && <DateInput date={dateFrom} setDate={setDateFrom} type={currentTab} title="From "/>} 
-        <DateInput date={date} setDate={setDate} type={currentTab} title={currentTab=="Custom"?"To ":"Today "}/>
+      <View >  
+        {currentTab=="Daily" && <DailyInput date={date} setDate={setDate}/>}
+        {currentTab=="Monthly" && <MonthlyInput month={month} setMonth={setMonth} year={year} setYear={setYear}/>}
+        {currentTab=="Custom" && <CustomInput dateFrom={dateFrom} setDateFrom={setDateFrom} dateTo={dateTo} setDateTo={setDateTo}/>} 
       </View>
 
-      <Pie setTotal={setTotal} currentTab={currentTab} s_date={dateFrom} e_date={date} />
+      {currentTab=="Daily" && <Pie allData={allData} setTotal={setTotal} currentTab={currentTab} date={date}/>}
+      {currentTab=="Monthly" && <Pie allData={allData} setTotal={setTotal} currentTab={currentTab} month={month} year={year}/>}
+      {currentTab=="Custom" && <Pie allData={allData} setTotal={setTotal} currentTab={currentTab} s_date={dateFrom} e_date={dateTo} />}
 
+ 
       <Total total={total}/>
   
     </View>
@@ -74,8 +104,8 @@ function Buttons(props) {
   )
 }
 
-function DateInput({date,setDate,type,title}){
 
+function DailyInput({date,setDate}){
     const [openDate,setOpenDate] = useState(false);
 
     return(
@@ -86,29 +116,120 @@ function DateInput({date,setDate,type,title}){
                 setOpenDate(true);
             }}
         >   
-            <View
-              style={{
-                //width:wp("100%"),
-              }}
-            >
-              {type=="Custom" && <Text style={styles.title}>{title}</Text>}
+            <View>
               <Text style={styles.date}>{date.getDate()}/{date.getMonth()+1}/{date.getFullYear()}</Text>
             </View>
            {openDate && <DateTimeModal mode='date' setOpen={setOpenDate} value={date} setValue={setDate}/>}
         </TouchableOpacity>
     )
+
+}
+
+function MonthlyInput({month,setMonth,year,setYear}){
+  const months=["January","Febuary","March","April","May","June","July","August","September","October","November","December"]
+
+  const _p="<<";
+  const _n=">>";
+  const space=" ";
+
+  return(
+
+    <View style={{flexDirection:'row', width:wp('100%'), justifyContent:"space-around",paddingVertical:hp("3%"),alignItems:"center"}}>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={()=>{
+            var month_temp = month;
+            if(month_temp==0) {month_temp=12; setYear(year-1);};
+            month_temp= (month_temp-1)%12
+            setMonth(month_temp);
+        }}
+      > 
+        <Text style={styles.date}> {_p} </Text>
+      </TouchableOpacity> 
+
+      <Text style={{color:"black",
+              fontSize:hp("3%"),
+              fontWeight:"bold",
+              textAlign:"center",
+              width:wp("50%"),
+              backgroundColor:"#F3CF58",
+              borderRadius:hp('2%'),
+              padding:hp("1%"),
+            }}
+      >
+            {months[month]}{space}{year} 
+      </Text>
+      {month < parseInt(moment(new Date()).format('MM'))-1 || year < parseInt(moment(new Date()).format('YYYY'))?
+        <TouchableOpacity  
+          activeOpacity={0.8}
+          onPress={()=>{
+              var month_temp = month;
+              if(month_temp==11) setYear(year+1);
+              month_temp = (month_temp+1)%12;
+              setMonth(month_temp); 
+          }}
+        >
+          <Text style={styles.date}>{_n}</Text>
+        </TouchableOpacity>
+        :
+        <TouchableOpacity>
+          <Text style={[styles.date,{color:"black"}]}>{_n}</Text>
+        </TouchableOpacity>
+      }
+    </View>
+
+  )
+}
+
+function CustomInput({dateFrom,setDateFrom,dateTo,setDateTo}){
+    const [openDateFrom,setOpenDateFrom] = useState(false);
+    const [openDateTo,setOpenDateTo] = useState(false);
+
+
+    const verifyFromDate = (selectedDate) =>{
+        if(selectedDate<=dateTo) setDateFrom(selectedDate);
+        else console.log("from date updation rejected");
+    }
+
+    const verifyToDate = (selectedDate) =>{      
+        if(selectedDate>=dateFrom) setDateTo(selectedDate);
+        else console.log("to date updation rejected");
+    }
+
+    return(
+      <View style={{flexDirection:"row",justifyContent:"space-around",height:hp("10%"),alignItems:"center"}}>
+      
+        <TouchableOpacity 
+            
+            activeOpacity={0.8}
+            onPress={()=>{
+                setOpenDateFrom(true);
+            }}
+        >   
+            <View>
+              <Text style={styles.title}>From</Text>
+              <Text style={styles.date}>{dateFrom.getDate()}/{dateFrom.getMonth()+1}/{dateFrom.getFullYear()}</Text>
+            </View>
+          {openDateFrom && <DateTimeModal mode='date' setOpen={setOpenDateFrom} value={dateFrom} setValue={verifyFromDate}/>}
+        </TouchableOpacity>
+        <TouchableOpacity 
+            
+            activeOpacity={0.8}
+            onPress={()=>{
+                setOpenDateTo(true);
+            }}
+        >   
+            <View>
+              <Text style={styles.title}>To</Text>
+              <Text style={styles.date}>{dateTo.getDate()}/{dateTo.getMonth()+1}/{dateTo.getFullYear()}</Text>
+            </View>
+          {openDateTo && <DateTimeModal mode='date' setOpen={setOpenDateTo} value={dateTo} setValue={verifyToDate}/>}
+        </TouchableOpacity>
+      </View>
+    )
 }
 
 function Pie(props) {
-  const all_data=[
-    {type: "FOOD", amount: 150, date: new Date()},
-    {type: "TRAVEL", amount: 100, date: new Date()},
-    {type: "LAUNDRY", amount: 100, date: new Date()},
-    {type: "STATIONARY", amount: 700, date: new Date()},
-    {type: "FOOD", amount: 600, date: new Date()},
-    {type: "OTHERS", amount: 90, date: new Date('2022-05-17')},
-    {type: "FOOD", amount: 100, date: new Date('2021-02-12')}
-  ]
 
   const [pieData,setPieData] = useState([
           { name: 'FOOD', population: 0, color: '#F3CF58', legendFontColor: '#F3CF58', legendFontSize: 15 },
@@ -118,36 +239,63 @@ function Pie(props) {
           { name: 'OTHERS', population: 0, color: '#79867C', legendFontColor: '#F3CF58', legendFontSize: 15 }
       ]);
 
-  const setDates = () =>{
-    var s_date = moment(props.s_date).format('YYYY-MM-DD');
-    var e_date = moment(props.e_date).format('YYYY-MM-DD');
+  const setDates = (allData) =>{
+    var s_date;
+    var e_date;
+
+    if(props.currentTab=="Daily"){
+      var s_date = moment(props.date).format('YYYY-MM-DD');
+      var e_date = moment(props.date).format('YYYY-MM-DD');
+    }else if(props.currentTab=="Custom"){
+      var s_date = moment(props.s_date).format('YYYY-MM-DD');
+      var e_date = moment(props.e_date).format('YYYY-MM-DD');
+    }
 
     var p=[0,0,0,0,0];
     var dt;
-    console.log(all_data);
-    all_data.forEach(x => {
-    dt = moment(x.date).format('YYYY-MM-DD')
-    
-    if(props.currentTab=="Daily") s_date = e_date;
-    
-    console.log("comparing"+dt+" "+s_date+" "+e_date)
-    if(dt>=s_date && dt<=e_date){
-            if(x.type=="FOOD")
-              p[0]+=x.amount
-            else if(x.type=="TRAVEL")
-              p[1]+=x.amount
-            else if(x.type=="LAUNDRY")
-              p[2]+=x.amount
-            else if(x.type=="STATIONARY")
-              p[3]+=x.amount
-            else      
-              p[4]+=x.amount
-    }  
-      
-    });
-      
-    console.log(p);
 
+    if(props.currentTab == "Daily"||"Custom"){
+
+      allData.forEach(x => {
+          dt = moment(x.date).format('YYYY-MM-DD')
+  
+          if(dt>=s_date && dt<=e_date){
+                  if(x.type=="Food")
+                    p[0]+=parseInt(x.amount)
+                  else if(x.type=="Transport")
+                    p[1]+=parseInt(x.amount)
+                  else if(x.type=="Laundary")
+                    p[2]+=parseInt(x.amount)
+                  else if(x.type=="Stationary")
+                    p[3]+=parseInt(x.amount)
+                  else      
+                    p[4]+=parseInt(x.amount)
+          }       
+        } 
+      );
+    }
+    if(props.currentTab == "Monthly"){
+      allData.forEach(x => {
+          var dt_month = parseInt(moment(x.date).format('MM'))-1;
+          var dt_year = parseInt(moment(x.date).format('YYYY'));
+
+          if(dt_month==props.month && dt_year==props.year){
+                  if(x.type=="Food")
+                    p[0]+=parseInt(x.amount)
+                  else if(x.type=="Transport")
+                    p[1]+=parseInt(x.amount)
+                  else if(x.type=="Laundary")
+                    p[2]+=parseInt(x.amount)
+                  else if(x.type=="Stationary")
+                    p[3]+=parseInt(x.amount)
+                  else      
+                    p[4]+=parseInt(x.amount)
+          }    
+        } 
+      );
+    }
+
+      
     var pie_data = [
       { name: 'FOOD', population: p[0], color: '#F3CF58', legendFontColor: '#F3CF58', legendFontSize: 15 },
       { name: 'TRAVEL', population: p[1], color: '#EC3852', legendFontColor: '#F3CF58', legendFontSize: 15 },
@@ -167,8 +315,8 @@ function Pie(props) {
 
   useEffect(()=>{
     //set all data using aysncStorage
-    setDates();
-  },[props.s_date,props.e_date])
+    setDates(props.allData);
+  },[props.s_date,props.e_date,props.date,props.month,props.allData])
 
   return (
     <View  >
