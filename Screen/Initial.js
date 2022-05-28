@@ -1,16 +1,13 @@
 import { StyleSheet, Text, SafeAreaView, Image, TouchableHighlight, Modal, View, TextInput } from 'react-native'
 import React, { useState,useEffect } from 'react'
-import { StatusBar } from 'expo-status-bar'
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
    
-export default function Initial () {
+export default function Initial (props) {
   const [modalVisible, setModalVisible] = useState(false)
   const [name, setName] = useState('');
   const [loading,setLoading] = useState(true);
 
-  const navigation = useNavigation();
 
   const handleLogin = async()=>{
     if(name.length >= 1){
@@ -23,9 +20,13 @@ export default function Initial () {
 
       AsyncStorage.setItem('username',JSON.stringify(name)).then(
         ()=>{
-          navigation.navigate("Main");
+          props.setLogged(true);
+          setLoading(false);
         }
       )
+    }else{
+      //alert
+      console.log("Invalid name")
     }
     
   }
@@ -36,19 +37,23 @@ export default function Initial () {
       //await AsyncStorage.clear();
       AsyncStorage.getItem('username').then((value)=>{
           console.log(value)
-          if(value!=null) navigation.navigate("Main");
+          if(value!=null) props.setLogged(true);
+          else  setLoading(false);
       });
-    
     } catch (error) {
       console.log(error)
     }
-    setLoading(false);
   } 
 
- 
+  useEffect(()=>{
+    newUser();
+    return()=>{
+      setName("");
+    }
+    
+  },[])
 
   if(loading){
-    newUser();
     return(
       <Text>Loading...</Text>
     )

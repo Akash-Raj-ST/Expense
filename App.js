@@ -1,6 +1,5 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { Ionicons } from '@expo/vector-icons';
 import Home from './Screen/Home';
@@ -9,30 +8,23 @@ import Settings from './Screen/Settings';
 import Add from './Screen/Add';
 import Initial from './Screen/Initial';
 
+import React, { useState,useEffect } from 'react'
 import { StatusBar } from 'react-native';
 
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
 
 export default function App() {
-  return (
-    <NavigationContainer>
-       <Stack.Navigator>
-        <Stack.Screen 
-          name="Initial" 
-          component={Initial} 
-          options={{
-            headerShown: false
-          }}/>
-        <Stack.Screen 
-          name="Main" 
-          component={HomeTabs} 
-          options={{
-            headerShown: false
-          }}/>
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
+  const [logged,setLogged] = useState(false);
+
+  if(logged){
+    return(
+      <HomeTabs/>
+    )
+  }
+
+  return(
+    <Initial setLogged={setLogged}/>
+  )
 }
 
 function HomeTabs(){
@@ -41,6 +33,7 @@ function HomeTabs(){
       <StatusBar
         style='light'
       />
+      <NavigationContainer>
         <Tab.Navigator
           screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
@@ -90,6 +83,7 @@ function HomeTabs(){
             }}
           />
         </Tab.Navigator>
+      </NavigationContainer>
     </>
   );
 }
