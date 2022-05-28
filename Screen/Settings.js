@@ -1,9 +1,10 @@
 
-import { StyleSheet, Text, View, ScrollView, TextInput, Image } from 'react-native'
+import { StyleSheet, Text, View, ScrollView, TextInput, Image, Alert } from 'react-native'
 import React,{useState,useEffect} from 'react'
 
 import Button from '../Components/Button';
 import { categories } from '../Components/Categories';
+import Loading from '../Components/Loading';
 
 import {
   widthPercentageToDP as wp,
@@ -44,16 +45,28 @@ export default function Settings() {
 
     const updateLimits = async()=>{
         try {
-			await AsyncStorage.setItem('limit_data', JSON.stringify(limits));
+			AsyncStorage.setItem('limit_data', JSON.stringify(limits)).then(
+                ()=>{
+                    Alert.alert(
+						"Success!!!",
+						"Limits updated successfully.",
+						[
+							{ text: "OK", onPress: () => console.log("OK Pressed") }
+						]
+					);
+                }
+            );
 		} catch (e) {
 			console.log(e);
 		}
         console.log("added to storage");
     }
 
+    
+
     if(loading){
         return(
-            <Text>Loading....</Text>
+            <Loading/>
         )
     }
     return (

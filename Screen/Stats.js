@@ -11,6 +11,7 @@ import {
 
 import Tab from '../Components/Tab';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loading from '../Components/Loading';
 
 export default function Stats() {
 
@@ -43,7 +44,7 @@ export default function Stats() {
 
   if(loading){
     return(
-      <Text>Loading....</Text>
+      <Loading/>
     )
   }
 

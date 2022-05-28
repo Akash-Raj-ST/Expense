@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native'
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, Alert } from 'react-native'
 import React,{useState,useEffect} from 'react'
 
 import Tab from '../Components/Tab';
@@ -13,6 +13,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import Loading from '../Components/Loading';
 
 export default function Add() {
   
@@ -77,9 +78,7 @@ function Expense(){
 
 	if(loading){
 		return(
-			<View>
-				<Text>Loading.....</Text>
-			</View>
+			<Loading/>
 		)
 	}
 	
@@ -102,8 +101,15 @@ function Expense(){
 				if(curr_value>limit_value && limit_value>0){
 					console.log("limit exceeded in "+categoryType+" limit was "+limit_value);
 					//alert
+					Alert.alert(
+						"OOPS!!!",
+						"limit exceeded in "+categoryType+" limit was "+limit_value,
+						[
+							{ text: "OK", onPress: () => console.log("OK Pressed") }
+						]
+					);
 				}
-			}+9+9
+			}
 			
 			let items  = await AsyncStorage.getItem('data');
 			
@@ -111,7 +117,17 @@ function Expense(){
 			else items = item;
 			
 			const jsonValue = JSON.stringify(items);
-			AsyncStorage.setItem('data', jsonValue).then(()=>{setTotalData(filterData(items))});
+			AsyncStorage.setItem('data', jsonValue).then(
+				()=>{
+					setTotalData(filterData(items));
+					Alert.alert(
+						"Success!!!",
+						"Item added successfully",
+						[
+							{ text: "OK", onPress: () => console.log("OK Pressed") }
+						]
+					);
+				});
 		} catch (e) {
 			console.log(e);
 		}
@@ -271,7 +287,17 @@ function Income(){
 			if(amount_present!=null) total_amount = curr_amount + parseFloat(JSON.parse(amount_present));  
 			else total_amount = curr_amount;
 
-			await AsyncStorage.setItem('amount', JSON.stringify(total_amount));
+			AsyncStorage.setItem('amount', JSON.stringify(total_amount)).then(
+				()=>{
+					Alert.alert(
+						"Success!!!",
+						"Amount updated",
+						[
+							{ text: "OK", onPress: () => console.log("OK Pressed") }
+						]
+					);
+				}
+			);
 			console.log(total_amount);      
 		} catch (e) {
 			console.log(e);

@@ -2,6 +2,7 @@ import { StyleSheet, Text, SafeAreaView, Image, TouchableHighlight, Modal, View,
 import React, { useState,useEffect } from 'react'
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loading from '../Components/Loading';
    
 export default function Initial (props) {
   const [modalVisible, setModalVisible] = useState(false)
@@ -55,7 +56,7 @@ export default function Initial (props) {
 
   if(loading){
     return(
-      <Text>Loading...</Text>
+      <Loading/>
     )
   }
 
