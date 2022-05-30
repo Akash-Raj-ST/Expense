@@ -93,21 +93,16 @@ function Expense(){
 
 		try {
 			//check limits
+			var limit_exceeded = false;
+
 			if(item[0].date.getMonth() == new Date().getMonth()){
 				console.log("COndition passed");
 				var limit_value = parseInt(limits[categoryType]);
 				var curr_value = parseInt(totalData[categoryType])+parseInt(item[0].amount);
 				console.log(curr_value);
 				if(curr_value>limit_value && limit_value>0){
+					limit_exceeded = true;
 					console.log("limit exceeded in "+categoryType+" limit was "+limit_value);
-					//alert
-					Alert.alert(
-						"OOPS!!!",
-						"limit exceeded in "+categoryType+" limit was "+limit_value,
-						[
-							{ text: "OK", onPress: () => console.log("OK Pressed") }
-						]
-					);
 				}
 			}
 			
@@ -120,13 +115,24 @@ function Expense(){
 			AsyncStorage.setItem('data', jsonValue).then(
 				()=>{
 					setTotalData(filterData(items));
-					Alert.alert(
-						"Success!!!",
-						"Item added successfully",
+					if(limit_exceeded){
+						Alert.alert(
+						"Heyyyyyyy!!!",
+						"Added but limit exceeded in "+categoryType+" limit was "+limit_value,
 						[
 							{ text: "OK", onPress: () => console.log("OK Pressed") }
 						]
 					);
+					}else{
+
+						Alert.alert(
+							"Success!!!",
+							"Item added successfully",
+							[
+								{ text: "OK", onPress: () => console.log("OK Pressed") }
+							]
+						);
+					}
 				});
 		} catch (e) {
 			console.log(e);

@@ -58,21 +58,24 @@ function HomeTabs(){
             name="Home"
             component={Home}
             options={{
-              headerShown: false
+              headerShown: false,
+              unmountOnBlur: true
             }}
           />
           <Tab.Screen
             name="Add"
             component={Add}
             options={{
-              headerShown: false
+              headerShown: false,
+              unmountOnBlur: true
             }}
           />
           <Tab.Screen
             name="Stats"
             component={Stats}
             options={{
-              headerShown: false
+              headerShown: false,
+              unmountOnBlur: true
             }}
           />
           <Tab.Screen
