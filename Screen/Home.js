@@ -1,265 +1,280 @@
-import { StyleSheet, Text, SafeAreaView, View, TouchableHighlight, FlatList } from 'react-native'
-import { FontAwesome, AntDesign, Ionicons } from '@expo/vector-icons'
-import React,{useState,useEffect} from 'react'
+import { StyleSheet, Text, SafeAreaView, View, TouchableHighlight, FlatList } from 'react-native';
+import { FontAwesome, AntDesign, Ionicons } from '@expo/vector-icons';
+import { widthPercentageToDP as wp, heightPercentageToDP as hper } from 'react-native-responsive-screen';
+import { React, useState, useEffect } from 'react';
+import * as Progress from 'react-native-progress';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loading from '../Components/Loading';
 
-const Data = [
-  {
-    id: '1',
-    title: 'Food',
-    iconType: 'fast-food',
-    amount: '250'
-  },
-  {
-    id: '2',
-    title: 'Trasnsport',
-    iconType: 'car-sharp',
-    amount: '250'
-  },
-  {
-    id: '3',
-    title: 'Laundry',
-    iconType: 'shirt',
-    amount: '250'
-  },
-  {
-    id: '4',
-    title: 'Stationary',
-    iconType: 'pencil-sharp',
-    amount: '250'
-  },
-  {
-    id: '5',
-    title: 'Others',
-    iconType: 'add',
-    amount: '250'
-  },
-  {
-    id: '6',
-    title: 'Food',
-    iconType: 'fast-food',
-    amount: '250'
-  },
-  {
-    id: '7',
-    title: 'Trasnsport',
-    iconType: 'car-sharp',
-    amount: '250'
-  },
-  {
-    id: '8',
-    title: 'Laundry',
-    iconType: 'shirt',
-    amount: '250'
-  },
-  {
-    id: '9',
-    title: 'Stationary',
-    iconType: 'pencil-sharp',
-    amount: '250'
-  },
-  {
-    id: '10',
-    title: 'Others',
-    iconType: 'add',
-    amount: '250'
-  }
-]
+const Item = ({ title, amount }) => {
 
-const Item = ({ title, iconType, amount }) => (
-  <View style={styles.item}>
-    <Ionicons name={iconType} size={39} color='#FF653C' />
-    <Text style={styles.title}>{title}</Text>
-    <Text style={styles.amtItem}><FontAwesome name='rupee' size={18} color='white' /> {amount}</Text>
-  </View>
-)
+	var iconType;
 
-export default function Home () {
+	if(title=="Food") iconType="fast-food";
+	else if(title=="Transport") iconType="car-sharp";
+	else if(title=="Stationary") iconType="pencil-sharp";
+	else if(title=="Laundary") iconType="shirt";
+	else iconType = "add"
 
-  const [name,setName] = useState("Welcome")
+	return(
+		<View style={styles.item}>
+		  <Ionicons name={iconType} size={39} color='#FF653C' />
+		  <Text style={styles.title}>{title}</Text>
+		  <Text style={styles.amtItem}><FontAwesome name='rupee' size={18} color='white' /> {amount}</Text>
+		</View>
+	)
+	
+}
 
-  const renderItem = ({ item }) => (
-    <Item title={item.title} iconType={item.iconType} amount={item.amount} />
-  )
+const progressBarColor = 'black';
+const remainingProgressBarColor = 'white';
 
-  const setUserName = async()=>{
-      try{
-         AsyncStorage.getItem('username').then((value)=>{setName(JSON.parse(value))})
-      }catch(e){
-        console.log(e);
-      }
-  }  
+export default function Home() {
+	const [ day, setDay ] = useState(new Date());
+	const [ Data, setAllData ] = useState([]);
+	const [filterData,setFilterData] = useState([]);
+	const [name,setName] = useState("Welcome");
+	const [loading,setLoading] = useState(true);
+	const [amount,setAmount] = useState(0);
+	const [remainingAmount,setRemainingAmount] = useState(0);
+	const [totalAmount,setTotalAmount] = useState(0);
+	const [progressValue,setProgressValue] = useState(1);
+
+	const equalDate = (date1,date2)=>{
+		date2 = new Date(date2);
+		if(date1.getDate()==date2.getDate() && date1.getMonth()==date2.getMonth() && date1.getFullYear()==date2.getFullYear()){
+			return true;
+		}
+		return false;
+	}
+
+	
+	const initializeData = async() =>{
+		var sum = 0;
+		try{
+			AsyncStorage.getItem('data').then((value)=>{
+				setAllData(JSON.parse(value));
+				var data = JSON.parse(value);
+				console.log(data);
+				for (var j = 0; j < data.length; j++) {
+					sum += parseInt(data[j].amount);
+				}
+				console.log(sum);
+			});
+			AsyncStorage.getItem('username').then((value)=>{setName(JSON.parse(value))});
+			AsyncStorage.getItem('amount').then((value)=>{
+				setAmount(JSON.parse(value));
+				setRemainingAmount(JSON.parse(value) - sum);
+				setProgressValue((JSON.parse(value) - sum) / JSON.parse(value));
+			});
+		
+		}catch(e){
+			console.log(e);
+		}
+		setLoading(false);
+	}
+
+	useEffect(()=>{
+		initializeData();
+	},[])
 
 
-  useEffect(()=>{
-    setUserName();
-  },[])
+	const currData = (date) => {
+		var displayData = [];
+		var currAmount = 0;
+		console.log(Data.length);
+		for (var j = 0; j < Data.length; j++) {
+			if (equalDate(date,Data[j].date)) {
+				displayData.push(Data[j]);
+				currAmount += parseInt(Data[j].amount);
+			}
+		}
+		setFilterData(displayData);
+		setTotalAmount(currAmount);
+		setProgressValue(remainingAmount / amount);
+	};
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.userName}>{name}</Text>
-      <View style={styles.infoContainer}>
-        <Text style={styles.unspendAmount}><FontAwesome name='rupee' size={24} color='black' /> 2,345</Text>
-        <Text style={styles.totalLimit}>Left of  <FontAwesome name='rupee' size={11} color='black' /> 5000</Text>
-        <View style={styles.totalLimitGraph}><Text> </Text></View>
-        <View style={styles.usageLimitGraph}><Text> </Text></View>
-      </View>
-      <View style={styles.infoContainer2}>
-        <TouchableHighlight
-          style={styles.btn1}
-          underlayColor='#41403F'
-          activeOpacity={0.6}
-        >
-          <AntDesign name='left' size={19} color='white' />
-        </TouchableHighlight>
-        <Text style={styles.dayText}>  Today </Text>
-        <TouchableHighlight
-          style={styles.btn2}
-          underlayColor='#41403F'
-          activeOpacity={0.6}
-        >
-          <AntDesign name='right' size={19} color='white' />
-        </TouchableHighlight>
-        <Text style={styles.amtStyle}><FontAwesome name='rupee' size={17} color='white' /> 1000</Text>
-      </View>
-      <View style={styles.listView}>
-        <FlatList
-          data={Data}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-        />
-      </View>
-      <View style={styles.addView}>
-        <TouchableHighlight
-          style={styles.btn3}
-          underlayColor='#CFB55F'
-          activeOpacity={0.6}
-        >
-          <Ionicons name='add-circle-sharp' size={59} color='#F3CF58' />
-        </TouchableHighlight>
-      </View>
-    </SafeAreaView>
-  )
+	const updateDateNext = () => {
+		var d = day;
+		d.setDate(d.getDate()+1);
+		setDay(d);
+		currData(d);
+	};
+
+	const updateDatePrevious = () => {
+		var d = day;
+		d.setDate(d.getDate()-1);
+		setDay(d);
+		currData(d);
+	};
+
+	const renderItem = ({ item }) => (
+		<Item title={item.type} amount={item.amount} />
+	)
+
+	if(loading){
+		return(
+			<Loading/>
+		)
+	}
+
+	return (
+		<SafeAreaView style={styles.container}>
+			<Text style={styles.userName}>{name}</Text>
+			<View style={styles.infoContainer}>
+				<Text style={styles.unspendAmount}>
+					<FontAwesome name="rupee" size={hper('3.65%')} color="black" /> {remainingAmount}
+				</Text>
+				<Text style={styles.totalLimit}>
+					Left of <FontAwesome name="rupee" size={hper('1.5%')} color="black" /> {amount}
+				</Text>
+				<Progress.Bar
+					progress={progressValue}
+					width={wp('73%')}
+					height={hper('1.2%')}
+					borderRadius={10}
+					color={progressBarColor}
+					unfilledColor={remainingProgressBarColor}
+					borderWidth={0}
+					style={styles.progressBar}
+				/>
+			</View>
+			<View style={styles.infoContainer2}>
+				<View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('50%') }}>
+					<TouchableHighlight
+						style={styles.btn1}
+						underlayColor="#41403F"
+						activeOpacity={0.6}
+						onPress={updateDatePrevious}
+					>
+						<AntDesign name="left" size={hper('2.55%')} color="white" />
+					</TouchableHighlight>
+					<Text style={styles.dayText}> {day.getDate()}/{day.getMonth()+1}/{day.getFullYear()}</Text>
+					<TouchableHighlight
+						style={styles.btn2}
+						underlayColor="#41403F"
+						activeOpacity={0.6}
+						onPress={updateDateNext}
+					>
+						<AntDesign name="right" size={hper('2.55%')} color="white" />
+					</TouchableHighlight>
+				</View>
+				<Text style={styles.amtStyle}>
+					<FontAwesome name="rupee" size={hper('2.29%')} color="white" /> {totalAmount}
+				</Text>
+			</View>
+			<View style={styles.listView}>
+				<FlatList data={filterData} renderItem={renderItem} keyExtractor={(filterData) => filterData.id} />
+			</View>
+		</SafeAreaView>
+	);
 }
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'black'
-  },
-  userName: {
-    fontStyle: 'normal',
-    fontWeight: '400',
-    color: 'white',
-    fontSize: 25,
-    marginLeft: '6%',
-    marginTop: '2%'
-  },
-  infoContainer: {
-    backgroundColor: '#F3CF58',
-    marginLeft: '6%',
-    marginRight: '6%',
-    marginTop: '9%',
-    height: '23%',
-    borderRadius: 9,
-    padding: '6%',
-    paddingLeft: '7%'
-  },
-  unspendAmount: {
-    fontSize: 24,
-    fontWeight: '400'
-  },
-  totalLimit: {
-    fontWeight: '400',
-    fontSize: 11,
-    marginTop: '8%'
-  },
-  totalLimitGraph: {
-    backgroundColor: 'white',
-    height: '8%',
-    marginTop: '10%',
-    borderRadius: 9
-  },
-  usageLimitGraph: {
-    backgroundColor: 'black',
-    height: '8%',
-    width: '53.2%',
-    borderRadius: 9,
-    position: 'absolute',
-    bottom: '26.5%',
-    left: '9.5%'
-  },
-  dayText: {
-    color: 'white',
-    fontSize: 17,
-    backgroundColor: 'transparent',
-    width: '29%',
-    position: 'absolute',
-    left: '5%',
-    bottom: '0.01%'
-  },
-  infoContainer2: {
-    backgroundColor: 'transparent',
-    marginLeft: '6%',
-    marginRight: '6%',
-    marginTop: '7%'
-  },
-  btn1: {
-    backgroundColor: 'transparent',
-    width: '6%'
-  },
-  btn2: {
-    backgroundColor: 'transparent',
-    width: '6%',
-    position: 'absolute',
-    left: '30%'
-  },
-  amtStyle: {
-    color: 'white',
-    position: 'absolute',
-    left: '50%',
-    fontSize: 17,
-    bottom: '0.1%'
-  },
-  item: {
-    backgroundColor: 'black',
-    color: 'white',
-    marginVertical: 8,
-    borderWidth: 1,
-    borderBottomColor: '#5B5541',
-    paddingBottom: '3%'
-  },
-  title: {
-    fontSize: 20,
-    color: '#857474',
-    position: 'absolute',
-    left: '18%',
-    top: '14%'
-  },
-  listView: {
-    marginTop: '5%',
-    marginLeft: '5%',
-    width: '90%',
-    height: '56%',
-    backgroundColor: 'transparent',
-    paddingLeft: '2%'
-  },
-  amtItem: {
-    color: 'white',
-    position: 'absolute',
-    right: '10%',
-    fontSize: 18,
-    top: '14%'
-  },
-  addView: {
-    color: 'yellow',
-    backgroundColor: 'black',
-    position: 'absolute',
-    height: '8%',
-    width: '15%',
-    bottom: '3%',
-    right: '3%',
-    borderRadius: 39,
-    padding: 0
-  }
-})
+	container: {
+		flex: 1,
+		backgroundColor: 'black'
+	},
+	userName: {
+		fontStyle: 'normal',
+		fontWeight: '400',
+		color: 'white',
+		fontSize: hper('3.33%'),
+		marginLeft: '6%',
+		marginTop: '2%'
+	},
+	infoContainer: {
+		backgroundColor: '#F3CF58',
+		marginLeft: '6%',
+		marginRight: '6%',
+		marginTop: '9%',
+		height: '23%',
+		borderRadius: hper('1.21%'),
+		padding: '6%',
+		paddingLeft: '7%'
+	},
+	unspendAmount: {
+		fontSize: hper('3.2%'),
+		fontWeight: '400'
+	},
+	totalLimit: {
+		fontWeight: '400',
+		fontSize: hper('1.45%'),
+		marginTop: '8%'
+	},
+	totalLimitGraph: {
+		backgroundColor: 'white',
+		height: '8%',
+		marginTop: hper('3.63%'),
+		borderRadius: hper('1.21%')
+	},
+	usageLimitGraph: {
+		backgroundColor: 'black',
+		height: '8%',
+		width: '53.2%',
+		borderRadius: hper('1.21%'),
+		position: 'absolute',
+		bottom: wp('6.7%'),
+		left: wp('7.2%')
+	},
+	dayText: {
+		color: 'white'
+	},
+	infoContainer2: {
+		backgroundColor: 'transparent',
+		marginLeft: '6%',
+		marginRight: '6%',
+		marginTop: '7%',
+		flexDirection: 'row'
+	},
+	btn1: {},
+	btn2: {},
+	amtStyle: {
+		color: 'white',
+		marginHorizontal: wp('5%')
+	},
+	item: {
+		backgroundColor: 'black',
+		color: 'white',
+		marginVertical: hper('1.09%'),
+		borderWidth: hper('0.15%'),
+		borderBottomColor: '#5B5541',
+		paddingBottom: '3%'
+	},
+	title: {
+		fontSize: hper('2.69%'),
+		color: '#857474',
+		position: 'absolute',
+		left: '18%',
+		top: '14%'
+	},
+	listView: {
+		marginTop: '5%',
+		marginLeft: '5%',
+		width: '90%',
+		height: '56%',
+		backgroundColor: 'transparent',
+		paddingLeft: '2%'
+	},
+	amtItem: {
+		color: 'white',
+		position: 'absolute',
+		right: '10%',
+		fontSize: hper('2.4%'),
+		top: '14%'
+	},
+	addView: {
+		color: 'yellow',
+		backgroundColor: 'black',
+		position: 'absolute',
+		height: '8%',
+		width: '15%',
+		bottom: '3%',
+		right: '3%',
+		borderRadius: hper('5.2%'),
+		padding: 0
+	},
+	progressBar: {
+		marginTop: hper('3%')
+	}
+});
