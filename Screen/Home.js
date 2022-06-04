@@ -7,15 +7,11 @@ import * as Progress from 'react-native-progress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loading from '../Components/Loading';
 
+import {CategoryData} from '../Components/Categories'
+
 const Item = ({ title, amount }) => {
 
-	var iconType;
-
-	if(title=="Food") iconType="fast-food";
-	else if(title=="Transport") iconType="car-sharp";
-	else if(title=="Stationary") iconType="pencil-sharp";
-	else if(title=="Laundary") iconType="shirt";
-	else iconType = "add"
+	var iconType = CategoryData[title].iconType;
 
 	return(
 		<View style={styles.item}>
@@ -164,9 +160,14 @@ export default function Home() {
 					<FontAwesome name="rupee" size={hper('2.29%')} color="white" /> {totalAmount}
 				</Text>
 			</View>
-			<View style={styles.listView}>
-				<FlatList data={filterData} renderItem={renderItem} keyExtractor={(filterData) => filterData.id} />
-			</View>
+			{filterData.length==0?
+				<Text style={{color:"white"}}>Empty</Text>
+					:
+
+				<View style={styles.listView}>
+					<FlatList data={filterData} renderItem={renderItem} keyExtractor={(filterData,index) => index} />
+				</View>
+			}
 		</SafeAreaView>
 	);
 }

@@ -14,7 +14,7 @@ export default function Initial (props) {
     if(name.length >= 1){
       setLoading(true);
       //intialize values
-      var limits = {Food:0,Transport:0,Laundary:0,Others:0};
+      var limits = {Food:0,Transport:0,Laundary:0,Stationary:0,Others:0};
       var data = [];
       await AsyncStorage.setItem('limit_data', JSON.stringify(limits));
       await AsyncStorage.setItem('data', JSON.stringify(data));
