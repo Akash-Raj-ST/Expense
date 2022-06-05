@@ -95,8 +95,8 @@ function Category(props){
         <View style={styles.category}>
             <View style={{flexDirection:"row",alignItems:"center",width:"75%"}}>      
                 <Ionicons name={props.category.iconType} size={36} color="#FF653C" />
+                <Text style={styles.categoryType}>{props.category.type}</Text>
             </View>
-            
             <TextInput 
                 style={{
                     borderWidth:2,
@@ -136,5 +136,6 @@ const styles = StyleSheet.create({
     categoryType:{
         color:"white",
         fontSize:hp("3%"),
+        paddingHorizontal:wp("2%"),
     }
 })
