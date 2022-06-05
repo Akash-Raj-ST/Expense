@@ -1,19 +1,43 @@
 export const categories = [
 		{
 			type:"Food",
-			logo:require("../assets/images/food.png"),
+			iconType:"fast-food",
 		},
 		{
 			type:"Transport",
-			logo:require("../assets/images/food.png"),
+			iconType:"car-sharp",
 		},
 		{
 			type:"Laundary",
-			logo:require("../assets/images/food.png"),
+			iconType:"shirt",
+		},
+		{
+			type:"Stationary",
+			iconType:"pencil-sharp"
 		},
 		{
 			type:"Others",
-			logo:require("../assets/images/food.png"),
+			iconType:"add",
 		},
        
 ]
+
+export const CategoryData = {
+	"Food":{
+		iconType:"fast-food",
+	},
+	"Transport":{
+		iconType:"car-sharp",
+	},
+	"Laundary":{
+		iconType:"shirt",
+	},
+	"Stationary":{
+		iconType:"pencil-sharp",
+	},
+	"Others":{
+		iconType:"add",
+	},
+}
+
+export const limitData = {Food:0,Transport:0,Laundary:0,Stationary:0,Others:0};

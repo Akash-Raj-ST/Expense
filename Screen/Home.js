@@ -7,15 +7,11 @@ import * as Progress from 'react-native-progress';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loading from '../Components/Loading';
 
+import {CategoryData} from '../Components/Categories'
+
 const Item = ({ title, amount }) => {
 
-	var iconType;
-
-	if(title=="Food") iconType="fast-food";
-	else if(title=="Transport") iconType="car-sharp";
-	else if(title=="Stationary") iconType="pencil-sharp";
-	else if(title=="Laundary") iconType="shirt";
-	else iconType = "add"
+	var iconType = CategoryData[title].iconType;
 
 	return(
 		<View style={styles.item}>
@@ -31,7 +27,7 @@ const progressBarColor = 'black';
 const remainingProgressBarColor = 'white';
 
 export default function Home() {
-	const [ day, setDay ] = useState(new Date());
+    const [ day, setDay ] = useState(new Date());
 	const [ Data, setAllData ] = useState([]);
 	const [filterData,setFilterData] = useState([]);
 	const [name,setName] = useState("Welcome");
@@ -40,8 +36,7 @@ export default function Home() {
 	const [remainingAmount,setRemainingAmount] = useState(0);
 	const [totalAmount,setTotalAmount] = useState(0);
 	const [progressValue,setProgressValue] = useState(1);
-
-	const equalDate = (date1,date2)=>{
+    const equalDate = (date1,date2)=>{
 		date2 = new Date(date2);
 		if(date1.getDate()==date2.getDate() && date1.getMonth()==date2.getMonth() && date1.getFullYear()==date2.getFullYear()){
 			return true;
@@ -79,11 +74,14 @@ export default function Home() {
 		initializeData();
 	},[])
 
+	useEffect(()=>{
+		currData(day);
+	},[Data])
+
 
 	const currData = (date) => {
 		var displayData = [];
 		var currAmount = 0;
-		console.log(Data.length);
 		for (var j = 0; j < Data.length; j++) {
 			if (equalDate(date,Data[j].date)) {
 				displayData.push(Data[j]);
@@ -92,7 +90,6 @@ export default function Home() {
 		}
 		setFilterData(displayData);
 		setTotalAmount(currAmount);
-		setProgressValue(remainingAmount / amount);
 	};
 
 	const updateDateNext = () => {
@@ -119,28 +116,19 @@ export default function Home() {
 		)
 	}
 
-	return (
-		<SafeAreaView style={styles.container}>
-			<Text style={styles.userName}>{name}</Text>
-			<View style={styles.infoContainer}>
-				<Text style={styles.unspendAmount}>
-					<FontAwesome name="rupee" size={hper('3.65%')} color="black" /> {remainingAmount}
+    return (
+         <SafeAreaView style={styles.container}>
+            <Text style={styles.userName}>{name}</Text>
+            <View style={styles.infoContainer}>
+                <Text style={styles.unspendAmount}>
+					₹{remainingAmount}
 				</Text>
 				<Text style={styles.totalLimit}>
-					Left of <FontAwesome name="rupee" size={hper('1.5%')} color="black" /> {amount}
+					Left of ₹{amount}
 				</Text>
-				<Progress.Bar
-					progress={progressValue}
-					width={wp('73%')}
-					height={hper('1.2%')}
-					borderRadius={10}
-					color={progressBarColor}
-					unfilledColor={remainingProgressBarColor}
-					borderWidth={0}
-					style={styles.progressBar}
-				/>
-			</View>
-			<View style={styles.infoContainer2}>
+              
+            </View>
+           <View style={styles.infoContainer2}>
 				<View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('50%') }}>
 					<TouchableHighlight
 						style={styles.btn1}
@@ -164,12 +152,18 @@ export default function Home() {
 					<FontAwesome name="rupee" size={hper('2.29%')} color="white" /> {totalAmount}
 				</Text>
 			</View>
-			<View style={styles.listView}>
-				<FlatList data={filterData} renderItem={renderItem} keyExtractor={(filterData) => filterData.id} />
-			</View>
-		</SafeAreaView>
-	);
+			{filterData.length==0?
+				<Text style={{color:"white"}}>Empty</Text>
+					:
+
+				<View style={styles.listView}>
+					<FlatList data={filterData} renderItem={renderItem} keyExtractor={(filterData,index) => index} />
+				</View>
+			}
+        </SafeAreaView>
+    )
 }
+
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,

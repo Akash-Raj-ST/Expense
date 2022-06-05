@@ -12,11 +12,12 @@ import {
 } from "react-native-responsive-screen";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
 
 
 export default function Settings() {
 
-    const [limits,setLimits] = useState({Food:0,Transport:0,Laundary:0,Others:0});
+    const [limits,setLimits] = useState({Food:0,Transport:0,Laundary:0,Stationary:0,Others:0});
     const [loading,setLoading] = useState(true);
 
     const getLimits = async()=>{
@@ -93,10 +94,9 @@ function Category(props){
     return(
         <View style={styles.category}>
             <View style={{flexDirection:"row",alignItems:"center",width:"75%"}}>      
-                <Image source={props.category.logo} style={{width:wp("10%"),height:wp("10%"),marginHorizontal:wp("3%")}}/>
+                <Ionicons name={props.category.iconType} size={36} color="#FF653C" />
                 <Text style={styles.categoryType}>{props.category.type}</Text>
             </View>
-            
             <TextInput 
                 style={{
                     borderWidth:2,
@@ -136,5 +136,6 @@ const styles = StyleSheet.create({
     categoryType:{
         color:"white",
         fontSize:hp("3%"),
+        paddingHorizontal:wp("2%"),
     }
 })

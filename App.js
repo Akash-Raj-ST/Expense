@@ -29,10 +29,7 @@ export default function App() {
 
 function HomeTabs(){
   return(
-    <>
-      <StatusBar
-        style='light'
-      />
+   
       <NavigationContainer>
         <Tab.Navigator
           screenOptions={({ route }) => ({
@@ -40,7 +37,9 @@ function HomeTabs(){
               let iconName
               if (route.name === 'Home') {
                 iconName = focused ? 'home' : 'home-outline'
-              } else if (route.name === 'Stats') {
+              } else if (route.name === 'Add') {
+                iconName = focused ? 'pie-chart' : 'pie-chart-outline'
+              }else if (route.name === 'Stats') {
                 iconName = focused ? 'pie-chart' : 'pie-chart-outline'
               }
               else if (route.name === 'Settings') {
@@ -87,7 +86,6 @@ function HomeTabs(){
           />
         </Tab.Navigator>
       </NavigationContainer>
-    </>
   );
 }
 
