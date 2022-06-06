@@ -1,5 +1,7 @@
 import { View, Modal , Text} from 'react-native'
 import React from 'react'
+import {StatusBar} from 'react-native';
+
 //import LottieView from 'lottie-react-native';
 
 // export default function Loading(){
@@ -18,7 +20,7 @@ import React from 'react'
 
 export default function Loading(){
     return(
-        <View>
+        <View style={{marginTop: StatusBar.currentHeight,}}>
             <Text>Loading...</Text>
         </View>
     )

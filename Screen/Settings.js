@@ -13,6 +13,7 @@ import {
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import {StatusBar} from 'react-native';
 
 
 export default function Settings() {
@@ -71,8 +72,8 @@ export default function Settings() {
         )
     }
     return (
-        <View style={{backgroundColor:"black",flex:1}}>
-            <Text style={styles.heading}>Limit Alerts</Text>
+        <View style={{backgroundColor:"black",flex:1,marginTop: StatusBar.currentHeight,}}>
+            <Text style={styles.heading}>Set Limits</Text>
             <View style={{height:"60%"}}>
                 <ScrollView>
                     {categories.map((category,index)=>(
@@ -95,7 +96,9 @@ function Category(props){
         <View style={styles.category}>
             <View style={{flexDirection:"row",alignItems:"center",width:"75%"}}>      
                 <Ionicons name={props.category.iconType} size={36} color="#FF653C" />
-                <Text style={styles.categoryType}>{props.category.type}</Text>
+                <Text style={styles.categoryType}>
+                        {props.category.type} 
+                </Text>
             </View>
             <TextInput 
                 style={{
@@ -111,8 +114,12 @@ function Category(props){
                 }}
                 value={String(amount)}
                 onChangeText={(value)=>{
-                                    props.setValue(props.category.type,value); 
-                                    setAmount(value);
+                                    var amt;
+                                    if(value=="") amt = value;
+                                    else amt = parseInt(value);
+
+                                    props.setValue(props.category.type,amt); 
+                                    setAmount(amt);
                             }}
                 keyboardType="number-pad"
             />

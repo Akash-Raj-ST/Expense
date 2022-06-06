@@ -13,6 +13,8 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import Loading from '../Components/Loading';
 import { Ionicons } from '@expo/vector-icons';
 
+import {StatusBar} from 'react-native';
+
 export default function Add() {
 	const [ currentTab, setCurrentTab ] = useState('Expense');
 
@@ -20,7 +22,8 @@ export default function Add() {
 		<View
 			style={{
 				backgroundColor: 'black',
-				flex: 1
+				flex: 1,
+				marginTop: StatusBar.currentHeight,
 			}}
 		>
 			<View
@@ -75,11 +78,21 @@ function Expense() {
 	const storeData = async () => {
 		console.log('Adding item');
 		console.log(limits);
+
+		if(amount<=0){
+			Alert.alert(
+				'Oops!!!',
+				"Enter a valid amount.",
+				[ { text: 'OK', onPress: () => console.log('OK Pressed') } ]
+			);
+			return;
+		}
+
 		const item = [
 			{
 				type: categoryType,
 				date: date,
-				amount: amount
+				amount: parseInt(amount)
 			}
 		];
 
@@ -210,7 +223,8 @@ function filterData(data) {
 
 	var finalData = { Food: 0, Transport: 0, Laundary: 0, Others: 0 };
 
-	data.forEach((element) => {
+	for(var i=0;i<data.length;i++){
+		var element = data[i];
 		var date = new Date(element.date);
 		if (date.getMonth() == month && date.getFullYear() == year) {
 			if (element.type in finalData) {
@@ -219,12 +233,13 @@ function filterData(data) {
 				finalData[element.type] = parseInt(element.amount);
 			}
 		}
-	});
+	}
+
 	console.log('filtered');
 	console.log(finalData);
 	return finalData;
 }
-
+  
 const styles = (category, choice) =>
 	StyleSheet.create({
 		category: {

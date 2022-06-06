@@ -20,7 +20,14 @@ export default function Input(props){
                     borderBottomColor:"white"
                 }}
                 value={props.attValue.toString()}
-                onChangeText={(value)=>props.setValue(value)}
+                onChangeText={(value)=>{
+                    if(props.type=="number-pad"){
+                        if(value=="") props.setValue("")
+                        else props.setValue(parseInt(value))
+                    }else{
+                        props.setValue(value)
+                    }
+                }}
                 keyboardType={props.type}
             />
         </View>

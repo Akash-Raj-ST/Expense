@@ -13,6 +13,8 @@ import Tab from '../Components/Tab';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loading from '../Components/Loading';
 
+import {StatusBar} from 'react-native';
+
 export default function Stats() {
 
   
@@ -50,7 +52,7 @@ export default function Stats() {
 
   return (
   
-    <View style={{backgroundColor:"black",flex:1}}>
+    <View style={{backgroundColor:"black",flex:1,marginTop: StatusBar.currentHeight,}}>
       <Header/>
 
       <Buttons currentTab={currentTab} setCurrentTab={setCurrentTab} />
@@ -257,9 +259,10 @@ function Pie(props) {
 
     if(props.currentTab == "Daily"||"Custom"){
 
-      allData.forEach(x => {
+      for(var i=0;i<allData.length;i++){
+          var x = allData[i];
           dt = moment(x.date).format('YYYY-MM-DD')
-  
+
           if(dt>=s_date && dt<=e_date){
                   if(x.type=="Food")
                     p[0]+=parseInt(x.amount)
@@ -272,11 +275,12 @@ function Pie(props) {
                   else      
                     p[4]+=parseInt(x.amount)
           }       
-        } 
-      );
+      }
+        
     }
     if(props.currentTab == "Monthly"){
-      allData.forEach(x => {
+      for(var i=0;i<allData.length;i++){
+          var x = allData[i];
           var dt_month = parseInt(moment(x.date).format('MM'))-1;
           var dt_year = parseInt(moment(x.date).format('YYYY'));
 
@@ -293,7 +297,6 @@ function Pie(props) {
                     p[4]+=parseInt(x.amount)
           }    
         } 
-      );
     }
 
       

@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loading from '../Components/Loading';
 
 import {CategoryData} from '../Components/Categories'
+import {StatusBar} from 'react-native';
 
 const Item = ({ title, amount }) => {
 
@@ -59,9 +60,12 @@ export default function Home() {
 			});
 			AsyncStorage.getItem('username').then((value)=>{setName(JSON.parse(value))});
 			AsyncStorage.getItem('amount').then((value)=>{
-				setAmount(JSON.parse(value));
-				setRemainingAmount(JSON.parse(value) - sum);
-				setProgressValue((JSON.parse(value) - sum) / JSON.parse(value));
+				var temp_amount;
+				if(value==null) temp_amount = 0;
+				else temp_amount = parseInt(JSON.parse(value))
+				setAmount(temp_amount);
+				setRemainingAmount(temp_amount - sum);
+				setProgressValue((temp_amount - sum) / temp_amount);
 			});
 		
 		}catch(e){
@@ -121,15 +125,15 @@ export default function Home() {
             <Text style={styles.userName}>{name}</Text>
             <View style={styles.infoContainer}>
                 <Text style={styles.unspendAmount}>
-					₹{remainingAmount}
+					₹ {remainingAmount}
 				</Text>
 				<Text style={styles.totalLimit}>
-					Left of ₹{amount}
+					Left of ₹ {amount}
 				</Text>
               
             </View>
            <View style={styles.infoContainer2}>
-				<View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('50%') }}>
+				<View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('50%'), alignItems:"center" }}>
 					<TouchableHighlight
 						style={styles.btn1}
 						underlayColor="#41403F"
@@ -149,11 +153,26 @@ export default function Home() {
 					</TouchableHighlight>
 				</View>
 				<Text style={styles.amtStyle}>
-					<FontAwesome name="rupee" size={hper('2.29%')} color="white" /> {totalAmount}
+					₹ {totalAmount}
 				</Text>
 			</View>
 			{filterData.length==0?
-				<Text style={{color:"white"}}>Empty</Text>
+				<View 
+					style={{
+						flex:1,
+						justifyContent:"center",
+						alignItems:"center"
+					}}
+				>
+					<Text style={{
+						color:"white",
+						fontWeight:"bold",
+						fontSize:hper("4%"),
+					}}
+					>
+						Empty!!!
+					</Text>	
+				</View>
 					:
 
 				<View style={styles.listView}>
@@ -167,7 +186,8 @@ export default function Home() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: 'black'
+		backgroundColor: 'black',
+		marginTop: StatusBar.currentHeight,
 	},
 	userName: {
 		fontStyle: 'normal',
@@ -189,11 +209,11 @@ const styles = StyleSheet.create({
 	},
 	unspendAmount: {
 		fontSize: hper('3.2%'),
-		fontWeight: '400'
+		fontWeight: 'bold'
 	},
 	totalLimit: {
 		fontWeight: '400',
-		fontSize: hper('1.45%'),
+		fontSize: hper('2%'),
 		marginTop: '8%'
 	},
 	totalLimitGraph: {
@@ -212,7 +232,8 @@ const styles = StyleSheet.create({
 		left: wp('7.2%')
 	},
 	dayText: {
-		color: 'white'
+		color: 'white',
+		fontSize:hper("3%"),
 	},
 	infoContainer2: {
 		backgroundColor: 'transparent',
@@ -225,7 +246,8 @@ const styles = StyleSheet.create({
 	btn2: {},
 	amtStyle: {
 		color: 'white',
-		marginHorizontal: wp('5%')
+		marginHorizontal: wp('5%'),
+		fontSize:hper("3%"),
 	},
 	item: {
 		backgroundColor: 'black',

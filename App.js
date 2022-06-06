@@ -38,7 +38,7 @@ function HomeTabs(){
               if (route.name === 'Home') {
                 iconName = focused ? 'home' : 'home-outline'
               } else if (route.name === 'Add') {
-                iconName = focused ? 'pie-chart' : 'pie-chart-outline'
+                iconName = focused ? 'cash' : 'cash-outline'
               }else if (route.name === 'Stats') {
                 iconName = focused ? 'pie-chart' : 'pie-chart-outline'
               }
@@ -81,7 +81,8 @@ function HomeTabs(){
             name="Settings"
             component={Settings}
             options={{
-              headerShown: false
+              headerShown: false,
+              unmountOnBlur: true
             }}
           />
         </Tab.Navigator>
