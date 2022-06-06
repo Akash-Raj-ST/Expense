@@ -9,7 +9,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 export default function Initial (props) {
   const [modalVisible, setModalVisible] = useState(false)
   const [name, setName] = useState('');
-  const [loading,setLoading] = useState(false);
+  const [loading,setLoading] = useState(true);
 
 
   const handleLogin = async()=>{
@@ -54,7 +54,7 @@ export default function Initial (props) {
   } 
 
   useEffect(()=>{
-    //newUser();
+    newUser();
     return()=>{
       setName("");
     }
