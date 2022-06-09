@@ -2,7 +2,7 @@ import { StyleSheet, Text, SafeAreaView, View, TouchableHighlight, FlatList } fr
 import { FontAwesome, AntDesign, Ionicons } from '@expo/vector-icons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hper } from 'react-native-responsive-screen';
 import { React, useState, useEffect } from 'react';
-import * as Progress from 'react-native-progress';
+import ProgressBar from 'react-native-progress/Bar';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loading from '../Components/Loading';
@@ -57,17 +57,19 @@ export default function Home() {
 					sum += parseInt(data[j].amount);
 				}
 				console.log(sum);
-			});
-			AsyncStorage.getItem('username').then((value)=>{setName(JSON.parse(value))});
-			AsyncStorage.getItem('amount').then((value)=>{
-				var temp_amount;
-				if(value==null) temp_amount = 0;
-				else temp_amount = parseInt(JSON.parse(value))
-				setAmount(temp_amount);
-				setRemainingAmount(temp_amount - sum);
-				setProgressValue((temp_amount - sum) / temp_amount);
-			});
-		
+			}).then(()=>{
+
+				AsyncStorage.getItem('amount').then((value)=>{
+					var temp_amount;
+					if(value==null) temp_amount = 0;
+					else temp_amount = parseInt(JSON.parse(value))
+					setAmount(temp_amount);
+					setRemainingAmount(temp_amount - sum);
+					setProgressValue((temp_amount - sum) / temp_amount);
+				});
+			})
+
+			AsyncStorage.getItem('username').then((value)=>{setName(JSON.parse(value))});		
 		}catch(e){
 			console.log(e);
 		}
@@ -130,7 +132,16 @@ export default function Home() {
 				<Text style={styles.totalLimit}>
 					Left of ₹ {amount}
 				</Text>
-              
+				 <ProgressBar
+						progress={progressValue}
+						width={wp('73%')}
+						height={hper('1.2%')}
+						borderRadius={10}
+						color={progressBarColor}
+						unfilledColor={remainingProgressBarColor}
+						borderWidth={0}
+						style={styles.progressBar}
+				/>
             </View>
            <View style={styles.infoContainer2}>
 				<View style={{ flexDirection: 'row', justifyContent: 'space-between', width: wp('50%'), alignItems:"center" }}>
